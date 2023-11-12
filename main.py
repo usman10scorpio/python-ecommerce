@@ -30,13 +30,22 @@ async def create_product(
     db.refresh(db_post)
     return db_post
 
-# Get sales between date range
+# Get sales between date range ( 2023-01-01  -  2023-01-01)
 @app.get("/sales/{start_date}/{end_date}", status_code=status.HTTP_200_OK)
 async def get_sales_range(
     start_date: str | None = None,
     end_date: str | None = None,
     db: Session = db_dependency
 ):
+    """
+    Example:
+    ```json
+    {
+        "start_date": "2023-01-01",
+        "end_date": "2023-12-31"
+    }
+    ```
+    """
     try:
         sales_data = db.query(models.Sale).filter(
             models.Sale.created_at >= start_date,
@@ -53,6 +62,14 @@ async def get_sales_product(
     type_product: int,
     db: Session = db_dependency
 ):
+    """
+    Example:
+    ```json
+    {
+        "type_product": 1
+    }
+    ```
+    """    
     try:
         query = db.query(models.Sale)
 
@@ -69,7 +86,15 @@ async def get_sales_product(
 async def get_sales_product(
     type_category: int,
     db: Session = db_dependency
-):
+): 
+    """
+    Example:
+    ```json
+    {
+        "type_category": 1
+    }
+    ```
+    """  
     try:
         query = db.query(models.Sale)
 
@@ -90,6 +115,17 @@ async def get_sales(
     type_category: int = None,
     db: Session = db_dependency
 ):
+    """
+    Example:
+    ```json
+    {
+        "start_date": "2023-01-01",
+        "end_date": "2023-12-31",
+        "type_product": 1,
+        "type_category": 1,
+    }
+    ```
+    """  
     try:
         sales_data = db.query(models.Sale).filter(
             models.Sale.created_at >= start_date,
@@ -109,6 +145,15 @@ async def get_revenue_period(
     end_date: str | None = None,
     db: Session = db_dependency
 ):
+    """
+    Example:
+    ```json
+    {
+        "start_date": "2023-01-01",
+        "end_date": "2023-12-31"
+    }
+    ```
+    """  
     try:
         revenue_data = db.query(models.Revenue).filter(
             models.Revenue.created_at >= start_date,
@@ -125,6 +170,14 @@ async def get_revenue_category(
     type_category: int = None,
     db: Session = db_dependency
 ):
+    """
+    Example:
+    ```json
+    {
+        "type_category": 1
+    }
+    ```
+    """  
     try:
         revenue_data = db.query(models.Revenue).filter(
             models.Revenue.category_id == type_category
@@ -142,6 +195,16 @@ async def get_revenue(
     type_category: int = None,
     db: Session = db_dependency
 ):
+    """
+    Example:
+    ```json
+    {
+        "start_date": "2023-01-01",
+        "end_date": "2023-12-31",
+        "type_category": 1,
+    }
+    ```
+    """ 
     try:
         revenue_data = db.query(models.Revenue).filter(
             models.Revenue.created_at >= start_date,
@@ -160,7 +223,7 @@ async def get_inventory(db: Session = db_dependency):
     return inventory
 
 # Update an inventory
-@app.put("/inventory{inventory_id}", status_code=status.HTTP_201_CREATED)
+@app.put("/inventory/{inventory_id}", status_code=status.HTTP_201_CREATED)
 async def update_inventory(
     id:  int = None,
     quantity: int = None,
@@ -168,6 +231,17 @@ async def update_inventory(
     category_id: int = None,
     db: Session = db_dependency):
     
+    """
+    Example:
+    ```json
+    {
+        "id": 1,
+        "quantity": 1,
+        "product_id": 1,
+        "category_id": 1,
+    }
+    ```
+    """ 
     # Check if the product exists
     db_inventory = db.query(models.Inventory).filter(models.Inventory.id == id).first()
     if not db_inventory:
@@ -190,6 +264,9 @@ async def update_inventory(
 # Inventory low stock
 @app.get("/inventory/low/stocks", status_code=status.HTTP_201_CREATED)
 async def low_stock_inventory(db: Session = db_dependency):
+    """
+   Stock alerts for items less than 5 in quantity
+    """     
     try:
         low_inventory = db.query(models.Inventory).filter(
             models.Inventory.quantity < 5
